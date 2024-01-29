@@ -1,1 +1,10 @@
-version: '3.14'
+version: '3'
+services:
+  nginx:
+    build:
+      context: .
+      dockerfile: requirements/NGINX/Dockerfile
+    container_name: nginx
+    ports:
+      - "443:443"
+    restart: on-failure  # Ici nous changeons, le container redémarrera uniquement en cas de crash.
