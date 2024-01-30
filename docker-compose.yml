@@ -1,10 +1,44 @@
-version: '3'
+version: "3.9"
 services:
   nginx:
     build:
       context: .
-      dockerfile: requirements/NGINX/Dockerfile
+      dockerfile: ./NGINX/Dockerfile
     container_name: nginx
     ports:
       - "443:443"
-    restart: on-failure  # Ici nous changeons, le container redémarrera uniquement en cas de crash.
+    restart: always
+
+
+
+# services:
+#   # Database
+#   db:
+#     image: mysql:5.7
+#     volumes:
+#       - /db_data_volume:/var/lib/mysql
+#     restart: always
+#     environment:
+#       MYSQL_ROOT_PASSWORD: password
+#       MYSQL_DATABASE: wordpress
+#       MYSQL_USER: wordpress
+#       MYSQL_PASSWORD: wordpress
+#   # Wordpress
+#   wordpress:
+#     depends_on:
+#       - db
+#     image: wordpress:latest
+#     volumes:
+#       - wordpress_data_volume:/var/www/html
+#       - ./src:/var/www/html
+#     ports:
+#       - "8000:80"
+#     restart: always
+#     environment:
+#       WORDPRESS_DB_HOST: db
+#       WORDPRESS_DB_USER: wordpress
+#       WORDPRESS_DB_PASSWORD: wordpress
+#       WORDPRESS_DB_NAME: wordpress
+# volumes:
+#   db_data_volume: {}
+#   wordpress_data_volume: {}

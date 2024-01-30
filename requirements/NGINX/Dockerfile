@@ -1,13 +1,26 @@
-FROM alpine:3.16
+# Utilisez l'image de base Alpine Linux
+FROM debian:buster
 
-RUN apk update -y && apk add -y nginx && apk add openssl -y
+# Installer NGINX
+RUN apt update && apt install nginx -y && apt install openssl -y
+
+# créer un dossier, qui permettra de stocker le certificat
 RUN mkdir -p /etc/nginx/ssl
-RUN openssl req -x509 -nodes -out /etc/nginx/ssl/inception.crt -keyout /etc/nginx/ssl/inception.key -subj "/C=MO/L=MED/O=1337/OU=student/CN=rarraji.42.fr/UID=rarraji"
-RUN mkdir -p /var/run/nginx
 
-COPY conf/nginx.conf /etc/nginx/nginx.conf
+# install certificat TSL
+RUN openssl req -x509 -nodes -out /etc/nginx/ssl/inception.crt -keyout /etc/nginx/ssl/inception.key -subj "/C=FR/ST=IDF/L=Paris/O=42/OU=42/CN=rarraji.42.fr/UID=rarraji"
 
+RUN chmod 755 /var/www/html
+RUN chown -R www-data:www-data /var/www/html
 
+# # Copier le site HTML
+COPY ./NGINX/index.html /var/www/index.html
+
+# Copier le fichier de configuration NGINX
+COPY ./NGINX/conf/nginx.conf /etc/nginx/conf.d
+
+# Exposer le port 443
 EXPOSE 443
 
-CMD [ "nginx", "-g", "deamon off;" ]
+# Démarrer NGINX en arrière-plan
+CMD ["nginx", "-g", "daemon off;"]
