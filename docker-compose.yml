@@ -1,44 +1,57 @@
-version: "3.9"
+version: "3.1"
 services:
+# nginx service
   nginx:
-    build:
-      context: .
-      dockerfile: ./NGINX/Dockerfile
+    depends_on:
+      - wordpress
+    build: ./NGINX
     container_name: nginx
+    volumes:
+      - wp:/var/www/html/wordpress
     ports:
-      - "443:443"
+      - 443:443
+    networks:
+      - InceptionNetwork
     restart: always
-
-
-
-# services:
-#   # Database
-#   db:
-#     image: mysql:5.7
-#     volumes:
-#       - /db_data_volume:/var/lib/mysql
-#     restart: always
-#     environment:
-#       MYSQL_ROOT_PASSWORD: password
-#       MYSQL_DATABASE: wordpress
-#       MYSQL_USER: wordpress
-#       MYSQL_PASSWORD: wordpress
-#   # Wordpress
-#   wordpress:
-#     depends_on:
-#       - db
-#     image: wordpress:latest
-#     volumes:
-#       - wordpress_data_volume:/var/www/html
-#       - ./src:/var/www/html
-#     ports:
-#       - "8000:80"
-#     restart: always
-#     environment:
-#       WORDPRESS_DB_HOST: db
-#       WORDPRESS_DB_USER: wordpress
-#       WORDPRESS_DB_PASSWORD: wordpress
-#       WORDPRESS_DB_NAME: wordpress
-# volumes:
-#   db_data_volume: {}
-#   wordpress_data_volume: {}
+# wordpress service
+  wordpress:
+    depends_on:
+      - mariadb
+    build: ./WordPress
+    container_name: wordpress
+    restart: always
+    env_file:
+      - .env
+    volumes:
+      - wp:/var/www/html/wordpress
+    networks:
+      - InceptionNetwork
+# database layer for wordpress >> mariadb
+  mariadb:
+    build: ./MARIADB
+    container_name: mariadb
+    restart: always
+    env_file:
+      - .env
+    volumes:
+      - db:/var/lib/mysql
+    networks:
+      - InceptionNetwork
+# create volumes and networks
+volumes:
+  wp:
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: /home/rarraji/data/wp
+  db:
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: /home/rarraji/data/db
+networks:
+  InceptionNetwork:
+    name: InceptionNetwork
+    driver: bridge
