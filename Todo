@@ -1,3 +1,0 @@
-# Démarrer NGINX en arrière-plan
-CMD ["nginx", "-g", "daemon off;"] 
-
